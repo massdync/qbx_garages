@@ -131,9 +131,15 @@ end
 ---@param playerVehicle PlayerVehicle
 ---@return VehicleType
 local function getVehicleType(playerVehicle)
-    if VEHICLES[playerVehicle.modelName].category == 'helicopters' or VEHICLES[playerVehicle.modelName].category == 'planes' then
+    local data = VEHICLES[playerVehicle.modelName]
+    if (not data) then
+        return VehicleType.CAR
+    end
+
+    local category = data.category
+    if category == 'helicopters' or category == 'planes' then
         return VehicleType.AIR
-    elseif VEHICLES[playerVehicle.modelName].category == 'boats' then
+    elseif category == 'boats' then
         return VehicleType.SEA
     else
         return VehicleType.CAR
@@ -153,10 +159,17 @@ lib.callback.register('qbx_garages:server:getGarageVehicles', function(source, g
     if not playerVehicles[1] then return end
     for _, vehicle in pairs(playerVehicles) do
         if not FindPlateOnServer(vehicle.props.plate) then
-            local vehicleType = Garages[garageName].vehicleType
+            local playerGarage = Garages[garageName]
+            local vehicleType = playerGarage.vehicleType
             if vehicleType == getVehicleType(vehicle) then
                 toSend[#toSend + 1] = vehicle
             end
+            --print('DEBUG veh: ', json.encode(vehicle, {indent=true}))
+            --[[
+            print('DEBUG veh: ', vehicle)
+            print('DEBUG vehType: ', vehicleType)
+            toSend[#toSend + 1] = vehicle
+            ]]
         end
     end
     return toSend

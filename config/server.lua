@@ -8,7 +8,9 @@ return {
     ---@param modelName string
     ---@return integer fee
     calculateImpoundFee = function(vehicleId, modelName)
-        local vehCost = VEHICLES[modelName].price
+        local vehInfo = VEHICLES[modelName]
+        local vehCost = 1
+        if (vehInfo) then vehCost = vehInfo.price end
         return qbx.math.round(vehCost * 0.02) or 0
     end,
 

@@ -99,7 +99,15 @@ local function displayVehicleInfo(vehicle, garageName, garageInfo, accessPoint)
     local engineColor = getProgressColor(engine)
     local bodyColor = getProgressColor(body)
     local fuelColor = getProgressColor(vehicle.props.fuelLevel)
-    local vehicleLabel = ('%s %s'):format(VEHICLES[vehicle.modelName].brand, VEHICLES[vehicle.modelName].name)
+
+    local vehInfo = VEHICLES[vehicle.modelName]
+    local brand = '[UNKNOWN_BRAND]'
+    local name = '[UNKNOWN_VEHICLE_NAME]'
+    if (vehInfo) then
+        brand = vehInfo.brand
+        name = vehInfo.name
+    end
+    local vehicleLabel = ('%s %s'):format(brand, name)
 
     local options = {
         {
@@ -182,6 +190,7 @@ end
 local function openGarageMenu(garageName, garageInfo, accessPoint)
     ---@type PlayerVehicle[]?
     local vehicleEntities = lib.callback.await('qbx_garages:server:getGarageVehicles', false, garageName)
+    print('=====')
 
     if not vehicleEntities then
         exports.qbx_core:Notify(locale('error.no_vehicles'), 'error')
@@ -195,7 +204,17 @@ local function openGarageMenu(garageName, garageInfo, accessPoint)
     local options = {}
     for i = 1, #vehicleEntities do
         local vehicleEntity = vehicleEntities[i]
-        local vehicleLabel = ('%s %s'):format(VEHICLES[vehicleEntity.modelName].brand, VEHICLES[vehicleEntity.modelName].name)
+        print('vehEnt: ', json.encode(vehicleEntity, {indent=true}))
+
+        local vehInfo = VEHICLES[vehicleEntity.modelName]
+        local brand = 'NO_BRAND'
+        local name = 'NO_NAME'
+        if (vehInfo) then
+            brand = vehInfo.brand or 'NO_BRAND'
+            name = vehInfo.name or 'NO_NAME'
+        end
+
+        local vehicleLabel = ('%s %s'):format(brand, name)
 
         options[#options + 1] = {
             title = vehicleLabel,
